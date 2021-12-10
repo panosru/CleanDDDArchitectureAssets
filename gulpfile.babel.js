@@ -45,7 +45,7 @@ import postcssTransformShortcut from 'postcss-transform-shortcut';
 
     const registerTask = Symbol('registerTask');
     const options = {
-        prod: ('prod' === process.env.MIX_ENV),
+        prod: ('prod' === process.env.MIX_ENV) || false,
         app: path.resolve('../Pages'),
         source: path.resolve('../Assets'),
         public: path.resolve('../wwwroot'),
@@ -147,6 +147,13 @@ import postcssTransformShortcut from 'postcss-transform-shortcut';
                         tasks: ['clearCache']
                     }
                 },
+                {
+                    caller: 'copy',
+                    deps: {
+                        method: 'series',
+                        tasks: ['clearCache']
+                    }
+                }
             ];
 
             for (let task of tasks) {
@@ -177,13 +184,13 @@ import postcssTransformShortcut from 'postcss-transform-shortcut';
             }
 
             gulp.task('run', gulp.parallel([
-                'clean', 'img', 'css', 'js'
+                'clean', 'img', 'css', 'js', 'copy'
             ]));
 
             gulp.task('watch', function () {
 
-                // Volt changes
-                // gulp.watch(Builder.paths.app + '/katerinakourteli_web/templates/**/*.eex', gulp.parallel(['clearCache']));
+                // Razor changes
+                // gulp.watch(Builder.paths.app + '/templates/**/*.razor', gulp.parallel(['clearCache']));
 
                 // image changes
                 gulp.watch(Builder.paths.img.source + '/**/*', gulp.parallel(['img']));
@@ -330,8 +337,9 @@ import postcssTransformShortcut from 'postcss-transform-shortcut';
             
             if (options.prod) {
                 postCssOpts.push(cssnano({
-                    autoprefixer: true,
-                    cssDeclarationSorter: true
+                    autoprefixer: false,
+                    cssDeclarationSorter: true,
+                    "postcss-merge-rules": false
                 }));
             }
             
@@ -444,7 +452,7 @@ import postcssTransformShortcut from 'postcss-transform-shortcut';
                     }, babel({
                         presets: ['@babel/env']
                     })))
-                    .pipe(sourcemaps.init({ loadMaps: true }))
+                    .pipe(sourcemaps.init({ loadMaps: options.prod }))
                     .pipe(deporder())
                     .pipe(concat(entry.out))
                     .pipe(rename({
@@ -452,7 +460,7 @@ import postcssTransformShortcut from 'postcss-transform-shortcut';
                     }))
                     .pipe(gulpif(options.prod, stripdebug()))
                     .pipe(gulpif(options.prod, uglify()))
-                    .pipe(sourcemaps.write('./'))
+                    .pipe(gulpif(!options.prod, sourcemaps.write('./')))
                     .pipe(gulp.dest(Builder.paths.js.dist));
             });
 
@@ -469,6 +477,35 @@ import postcssTransformShortcut from 'postcss-transform-shortcut';
                     imgSource: Builder.paths.img.source,
                     imgDist: Builder.paths.img.dist
                 }));
+
+            done();
+        }
+
+        copyTask(done) {
+            console.log("Copying files");
+
+            let files = [
+                {
+                    from: Builder.paths.img.source + '/favicon.ico',
+                    to: Builder.paths.dist,
+                    prefix: 2
+                },
+                {
+                    from: Builder.paths.source + '/robots.txt',
+                    to: Builder.paths.dist,
+                    prefix: 1
+                },
+                {
+                    from: Builder.paths.source + '/sitemap.xml',
+                    to: Builder.paths.dist,
+                    prefix: 1
+                }
+            ];
+
+            files.forEach(file => {
+                gulp.src(file.from)
+                    .pipe(gulpCopy(file.to, { prefix: file.prefix}));
+            });
 
             done();
         }
