@@ -38,7 +38,7 @@ import postcssPurge from '@fullhuman/postcss-purgecss';
 import gulpTS from 'gulp-typescript';
 import colorguard from 'colorguard';
 import cssgrace from 'cssgrace';
-import razor from './gulp-razor';
+import razor from './gulp-razor.mjs';
 import postcssTransformShortcut from 'postcss-transform-shortcut';
 
 (function () {
@@ -123,7 +123,7 @@ import postcssTransformShortcut from 'postcss-transform-shortcut';
         constructor() {
 
             let tasks = [
-                'omg',
+                'demo',
                 'clearCache',
                 'clean',
                 {
@@ -215,8 +215,8 @@ import postcssTransformShortcut from 'postcss-transform-shortcut';
             }
         }
 
-        omgTask(done) {
-            console.warn("I'm omg task!");
+        demoTask(done) {
+            console.warn("I'm demo task!");
 
             return done();
         }

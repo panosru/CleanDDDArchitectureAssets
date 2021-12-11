@@ -1,0 +1,15 @@
+{
+  "name": "assets",
+  "description": "",
+  "main": "gulpfile.babel.js",
+  "authors": [
+    "Panagiotis <400362+panosru@users.noreply.github.com>"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/panosru/CleanDDDArchitectureAssets",
+  "private": true,
+  "dependencies": {
+    "bootstrap": "^4.4.1",
+    "Font-Awesome": "^5.12.0"
+  }
+}

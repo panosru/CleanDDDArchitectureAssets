@@ -1,7 +1,7 @@
 'use strict';
 
 import through from 'through2';
-import {PluginError} from 'gulp-util';
+let /** @type {import('gulp-util').PluginError} */ PluginError;
 import {JSDOM} from 'jsdom';
 import jQuery from 'jquery';
 import newer from "gulp-newer";
